@@ -65,7 +65,7 @@ class _SignUpPageState extends State<SignUpPage> {
     setState(() => _isLoading = true);
 
     try {
-      final response = await _authService.signUp(
+      final user = await _authService.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
@@ -73,7 +73,7 @@ class _SignUpPageState extends State<SignUpPage> {
       if (mounted) {
         setState(() => _isLoading = false);
 
-        if (response.user != null) {
+        if (user != null) {
           // Show success dialog
           _showVerificationDialog();
         }

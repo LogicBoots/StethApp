@@ -4,6 +4,8 @@ import 'home_page.dart';
 import 'language_provider.dart';
 import 'auth_service.dart';
 import 'signup_page.dart';
+import 'services/firebase_service.dart';
+import 'pages/profile_setup_page.dart';
 
 class LoginPage extends StatefulWidget {
   final LanguageProvider languageProvider;
@@ -87,7 +89,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     setState(() => _isLoading = true);
 
     try {
-      final response = await _authService.signIn(
+      final user = await _authService.signIn(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
@@ -95,30 +97,45 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       if (mounted) {
         setState(() => _isLoading = false);
 
-        if (response.user != null) {
+        if (user != null) {
+          // Reload user to get latest email verification status
+          await user.reload();
+          final currentUser = _authService.currentUser;
+          
           // Check if email is verified
-          if (!_authService.isEmailVerified) {
+          if (currentUser?.emailVerified != true) {
             _showEmailNotVerifiedDialog();
             return;
           }
 
-          // Navigate to home page
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) =>
-                  HomePage(languageProvider: widget.languageProvider),
-            ),
-          );
+          // Check if user profile exists
+          final profileExists = await FirebaseService().userProfileExists(user.uid);
+          
+          if (!profileExists) {
+            // Navigate to profile setup
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => ProfileSetupPage(
+                  uid: user.uid,
+                  email: user.email ?? '',
+                ),
+              ),
+            );
+          } else {
+            // Navigate to home page
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) =>
+                    HomePage(languageProvider: widget.languageProvider),
+              ),
+            );
+          }
         }
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        String errorMessage = e.toString();
-        if (errorMessage.contains('Invalid login credentials')) {
-          errorMessage = 'Invalid email or password';
-        }
-        _showError(errorMessage);
+        _showError(e.toString());
       }
     }
   }
@@ -368,7 +385,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   const SizedBox(height: 16),
 
                   const Text(
-                    'Coeur AI',
+                    'AI Stethoscope',
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,

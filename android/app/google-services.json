@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "203284276060",
+    "project_id": "stethapp-3e450",
+    "storage_bucket": "stethapp-3e450.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:203284276060:android:5d5f789a08edb393115799",
+        "android_client_info": {
+          "package_name": "com.stethapp.medical"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_wXLB5_l3vAzBizfk1meRhi8wqRa9XL8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
